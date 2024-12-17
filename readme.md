@@ -17,7 +17,7 @@ To set up the application, follow these steps:
 
 1. **Clone the Repository:**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/bielaltoe/computer_vision_project_1.git
    ```
 
 2. **Create and Activate a Virtual Environment (Optional but Recommended):**
