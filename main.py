@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
         # Add arrow size variables
         self.world_arrow_size = 1.5
         self.camera_arrow_size = 1.5
-        
+
         # definindo as variaveis
         self.set_variables()
         # Ajustando a tela
@@ -128,7 +128,7 @@ class MainWindow(QMainWindow):
         # Create file open button
         file_button = QPushButton("Open STL File")
         file_button.clicked.connect(self.open_stl_file)
-        
+
         # Add the button to reset_layout (before adding reset_button)
         reset_layout.addWidget(file_button)
 
@@ -339,6 +339,7 @@ class MainWindow(QMainWindow):
         self.fig2 = plt.figure()
         self.ax2 = self.fig2.add_subplot(111, projection="3d")
         self.ax2.set_title("3D Scene", pad=20, fontsize=12, fontweight="bold")
+
         self.ax2.set_xlabel("X", fontsize=10)
         self.ax2.set_ylabel("Y", fontsize=10)
         self.ax2.set_zlabel("Z", fontsize=10)
@@ -376,7 +377,7 @@ class MainWindow(QMainWindow):
         self.ax1.set_ylabel("Y (pixels)", fontsize=10)
         self.ax1.grid(True, linestyle="--", alpha=0.3)
         self.ax1.set_xlim(0, self.px_base)
-        self.ax1.set_ylim(0, self.px_altura)
+        self.ax1.set_ylim(self.px_altura, 0)
         if self.objeto is not None:
             object_2d = self.projection_2d()
             self.ax1.plot(object_2d[0, :], object_2d[1, :], "r-")
@@ -620,7 +621,7 @@ class MainWindow(QMainWindow):
 
         intrinsic_params = np.array(
             [
-                [dx, -dx * self.stheta, self.ox],
+                [dx, dist_foc * self.stheta, self.ox],
                 [0, dy, self.oy],
                 [0, 0, 1],
             ]
@@ -632,8 +633,15 @@ class MainWindow(QMainWindow):
         self.reset_plot()
 
         # Redraw 3D plot with different arrow sizes for world and camera
-        self.draw_arrows(self.cam[:, -1], self.cam[:, 0:3], self.ax2, length=self.camera_arrow_size)
-        self.draw_arrows(self.cam_original[:, -1], self.cam_original[:, 0:3], self.ax2, length=self.world_arrow_size)
+        self.draw_arrows(
+            self.cam[:, -1], self.cam[:, 0:3], self.ax2, length=self.camera_arrow_size
+        )
+        self.draw_arrows(
+            self.cam_original[:, -1],
+            self.cam_original[:, 0:3],
+            self.ax2,
+            length=self.world_arrow_size,
+        )
         if self.objeto is not None:
             self.ax2.plot(self.objeto[0, :], self.objeto[1, :], self.objeto[2, :], "r-")
         self.ax2.plot(self.cam[0, :], self.cam[1, :], self.cam[2, :], "g-")
@@ -651,7 +659,7 @@ class MainWindow(QMainWindow):
         # Keep the original object but reset its position
         if self.objeto_original is not None:
             self.objeto = self.objeto_original.copy()
-        
+
         # Reset all other parameters
         self.cam_original = self.init_cam()
         self.cam = self.cam_original
@@ -665,7 +673,7 @@ class MainWindow(QMainWindow):
         self.projection_matrix = []
         self.world_arrow_size = 1.5  # Reset arrow sizes
         self.camera_arrow_size = 1.5
-        
+
         self.reset_plot()
         self.update_canvas()
 
@@ -724,10 +732,7 @@ class MainWindow(QMainWindow):
 
     def open_stl_file(self):
         file_path, _ = QFileDialog.getOpenFileName(
-            self,
-            "Open STL File",
-            "",
-            "STL Files (*.stl);;All Files (*.*)"
+            self, "Open STL File", "", "STL Files (*.stl);;All Files (*.*)"
         )
         if file_path:
             self.objeto_original = Model3D(file_path).model
